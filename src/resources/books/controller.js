@@ -63,10 +63,59 @@ const updateOneById =  (req, res) => {
   .catch(console.error);
 }
 
+const updateById = (req, res) => {
+  const id = req.params.id;
+  const bookToUpdate = req.body;
+  console.log(bookToUpdate);
+
+  console.log(req.params.id);
+  console.log(req.body);
+
+  let sqlTemplate = `
+    UPDATE books SET 
+  `;
+
+  const sqlParams = [];
+
+  let i = 1;
+  for (const key in bookToUpdate) {
+    sqlTemplate += ` ${key} = $${i++},`;
+    sqlParams.push(bookToUpdate[key])
+  }
+
+  sqlParams.push(id);
+  
+  sqlTemplate = sqlTemplate.slice(0, sqlTemplate.length - 1);
+  sqlTemplate += ` WHERE id = $${i}`;
+  sqlTemplate += ` returning *`
+
+  console.log(sqlTemplate);
+  console.log(sqlParams);
+
+  db.query(sqlTemplate, sqlParams)
+    .then(result => res.json({data: result.rows[0]}))
+    .catch(console.error)
+}
+
+const deleteById = (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+
+  const deleteSQL=`
+  DELETE FROM books 
+  WHERE id = $1
+  `;
+
+  db.query(deleteSQL, [id])
+  .then(result => res.json({ message: "Item ${id} deleted" }))
+  .catch(console.error)
+}
 
 module.exports = {
   createOne,
   getAll,
   getOneById,
-  updateOneById
+  updateOneById,
+  updateById,
+  deleteById
 };

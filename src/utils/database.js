@@ -1,5 +1,5 @@
 const { Client } = require("pg");
-console.log(process.env)
+// console.log(process.env)
 
 const connection = process.env.PGURL;
 
